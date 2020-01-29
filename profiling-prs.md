@@ -23,6 +23,7 @@ from github import Github
 # put your own token here to access Github API, see https://github.com/settings/tokens
 
 g = Github("your_own_token_here")
+
 repo = g.get_repo("scikit-image/scikit-image")
 open_prs = repo.get_pulls(state='open')
 ```
@@ -64,11 +65,9 @@ df['unit'] = 1
 df['year']=df['date'].dt.year + df['date'].dt.month / 12.
 df.loc[df.module.isna(), 'module'] = 'Other'
 df.number = df.number.astype(str) # because of a bug to be corrected in px.sunburst
-
-```
-
-```python
-df.columns
+df['number'] = \
+    ["<a href='https://www.github.com/scikit-image/scikit-image/pull/%s'> %s </a>" %(lab, lab) 
+     for lab in df['number']]
 ```
 
 ## Visualizations of files modified by pull request
@@ -81,6 +80,7 @@ Colors of these charts can correspond to the upper level (here, `module` column)
 import plotly.express as px
 fig = px.sunburst(df, path=['module', 'filename', 'number'], values='unit',
                  hover_data=['title', 'date'], maxdepth=2)
+
 fig.show()
 ```
 
@@ -90,17 +90,11 @@ In the treemap below we can explore the different modules, and see that for exam
 import plotly.express as px
 fig = px.treemap(df, path=['module', 'filename', 'number'], values='unit',
                  hover_data=['title', 'date'])
+
 fig.show()
 ```
 
-In the sunburst and treemap below (same data, you can choose the viz you prefer), we color the sectors by year where the PR was opened. For file and modules the color is the average of their leaves. With this kind of visualization you can see rapidly which PRs are very old or very recent, and in which modules there are located.
-
-```python
-fig = px.sunburst(df, path=['module', 'filename', 'number'], values='unit',
-                 color='year', hover_data=['title', 'date'], maxdepth=2,
-                 color_continuous_scale='rdbu')
-fig.show()
-```
+In the treemap below, we color the sectors by year where the PR was opened. For file and modules the color is the average of their leaves. With this kind of visualization you can see rapidly which PRs are very old or very recent, and in which modules there are located.
 
 ```python
 fig = px.treemap(df, path=['module', 'filename', 'number'], values='unit',
@@ -155,12 +149,16 @@ df = pd.DataFrame(all_files)
 df['year']=df['date'].dt.year + df['date'].dt.month / 12.
 df.loc[df.module.isna(), 'module'] = 'Other'
 df.number = df.number.astype(str) # because of a bug to be corrected in px.sunburst
+df['number'] = \
+    ["<a href='https://www.github.com/scikit-image/scikit-image/pull/%s'> %s </a>" %(lab, lab) 
+     for lab in df['number']]
 ```
 
 ```python
 import plotly.express as px
 fig = px.treemap(df, path=['module', 'number'],
                  hover_data=['title', 'date'])
+
 fig.show()
 ```
 
@@ -233,6 +231,9 @@ df['unit'] = 1
 df['year']=df['date'].dt.year + df['date'].dt.month / 12.
 df.loc[df.module.isna(), 'module'] = 'Other'
 df['filename'] = [os.path.basename(filename) for filename in df['filename']]
+df['number'] = \
+    ["<a href='https://www.github.com/scikit-image/scikit-image/pull/%s'> %s </a>" %(lab, lab) 
+     for lab in df['number']]
 ```
 
 ```python
@@ -246,15 +247,6 @@ import plotly.express as px
 fig = px.treemap(df, path=['module', 'filename', 'contributor'], color='year',
                 color_continuous_scale='Inferno')
 fig.show()
-```
-
-```python
-df['year']
-```
-
-```python
-df[:80]
-
 ```
 
 ```python
